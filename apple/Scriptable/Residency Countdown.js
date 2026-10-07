@@ -10,6 +10,31 @@ const COLORS = {
   track: new Color("f0e8ef"),
 };
 
+// Clamp month-end dates: January 31 + one month becomes February 28/29.
+function addMonths(date, months) {
+  const result = new Date(date);
+  result.setDate(1);
+  result.setMonth(result.getMonth() + months);
+  const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+  result.setDate(Math.min(date.getDate(), lastDay));
+  return result;
+}
+
+function calculateCountdown(now, start = START, end = END) {
+  const remaining = Math.max(0, end - now);
+  const progress = Math.max(0, Math.min(100, ((now - start) / (end - start)) * 100));
+  if (!remaining) return { complete: true, totalDays: 0, progress, months: 0, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+  let months = Math.max(0, (end.getFullYear() - now.getFullYear()) * 12 + end.getMonth() - now.getMonth());
+  if (addMonths(now, months) > end) months--;
+  let rest = Math.max(0, Math.floor((end - addMonths(now, months)) / 1000));
+  const weeks = Math.floor(rest / 604800); rest %= 604800;
+  const days = Math.floor(rest / 86400); rest %= 86400;
+  const hours = Math.floor(rest / 3600); rest %= 3600;
+  const minutes = Math.floor(rest / 60);
+  return { complete: false, totalDays: Math.ceil(remaining / 86400000), progress, months, weeks, days, hours, minutes, seconds: rest % 60 };
+}
+
+
 const now = new Date();
 const remaining = Math.max(0, END.getTime() - now.getTime());
 const days = Math.ceil(remaining / 86400000);
@@ -69,7 +94,7 @@ if (complete) {
   const dayColumn = body.addStack();
   dayColumn.layoutVertically();
   const number = dayColumn.addText(days.toLocaleString());
-  number.font = Font.regularRoundedSystemFont(large ? 72 : small ? 40 : 48);
+  number.font = Font.regularRoundedSystemFont(large ? 48 : small ? 40 : 48);
   number.textColor = COLORS.pink;
   number.minimumScaleFactor = 0.6;
   number.lineLimit = 1;
@@ -77,10 +102,40 @@ if (complete) {
   label.font = Font.mediumRoundedSystemFont(12);
   label.textColor = COLORS.ink;
 
-  body.addSpacer(small ? 5 : large ? 16 : 20);
+  body.addSpacer(small ? 5 : large ? 8 : 20);
   const detail = body.addStack();
   detail.layoutVertically();
-  if (!small) {
+  if (large) {
+    const snapshot = calculateCountdown(now);
+    const stamp = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const caption = detail.addText(`BREAKDOWN · AS OF ${stamp}`);
+    caption.font = Font.mediumRoundedSystemFont(9);
+    caption.textColor = COLORS.muted;
+    detail.addSpacer(6);
+    for (const units of [["months", "weeks", "days"], ["hours", "minutes", "seconds"]]) {
+      const row = detail.addStack();
+      for (let i = 0; i < units.length; i++) {
+        if (i) row.addSpacer(12);
+        const cell = row.addStack();
+        cell.layoutVertically();
+        cell.size = new Size(76, 0);
+        const value = cell.addText(String(snapshot[units[i]]).padStart(2, "0"));
+        value.font = Font.regularMonospacedSystemFont(22);
+        value.textColor = COLORS.ink;
+        value.lineLimit = 1;
+        value.minimumScaleFactor = 0.6;
+        const unit = cell.addText(units[i]);
+        unit.font = Font.mediumRoundedSystemFont(10);
+        unit.textColor = COLORS.muted;
+      }
+      detail.addSpacer(6);
+    }
+    const liveLabel = detail.addText("LIVE TIMER · TOTAL HOURS : MIN : SEC");
+    liveLabel.font = Font.mediumRoundedSystemFont(9);
+    liveLabel.textColor = COLORS.muted;
+    detail.addSpacer(3);
+  }
+  if (!small && !large) {
     const caption = detail.addText("UNTIL YOUR NEXT CHAPTER");
     caption.font = Font.semiboldRoundedSystemFont(9);
     caption.textColor = COLORS.muted;
@@ -92,7 +147,7 @@ if (complete) {
   // Timer style uses total hours, minutes and seconds, not a custom day breakdown.
   const timer = detail.addDate(END);
   timer.applyTimerStyle();
-  timer.font = Font.regularMonospacedSystemFont(small ? 16 : large ? 28 : 22);
+  timer.font = Font.regularMonospacedSystemFont(small ? 16 : large ? 20 : 22);
   timer.textColor = COLORS.ink;
   timer.lineLimit = 1;
   timer.minimumScaleFactor = 0.6;
@@ -107,7 +162,7 @@ if (complete) {
     const encouragement = widget.addText("One day closer, meri jaan.");
     encouragement.font = Font.regularRoundedSystemFont(14);
     encouragement.textColor = COLORS.ink;
-    widget.addSpacer(12);
+    widget.addSpacer(6);
   }
   const percent = Math.floor(progress * 1000) / 10;
   const progressLabel = widget.addText(`${percent.toFixed(1)}% of residency complete`);
@@ -117,11 +172,13 @@ if (complete) {
   progressLabel.minimumScaleFactor = 0.7;
 }
 
-// Refresh when the rounded-up day count changes. The system controls the
-// actual refresh budget, so updates can appear a little after this time.
+// Large widgets request a snapshot refresh after 15 minutes; the system
+// controls actual timing. Native timer text updates independently.
 if (!complete) {
   const nextChange = new Date(END.getTime() - Math.max(0, days - 1) * 86400000);
-  widget.refreshAfterDate = nextChange > now ? nextChange : new Date(now.getTime() + 60 * 60 * 1000);
+  widget.refreshAfterDate = large
+    ? new Date(Math.min(nextChange.getTime(), now.getTime() + 15 * 60 * 1000))
+    : nextChange;
 }
 
 Script.setWidget(widget);

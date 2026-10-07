@@ -30,3 +30,9 @@ Replace the contents of your existing `Residency Countdown` script in Scriptable
 The timer uses `WidgetDate.applyTimerStyle()` with the actual completion date. It can update independently of script refreshes; it is not a custom months/weeks/days/seconds display. Mirrored iPhone widgets on macOS may update less frequently, so continuous second-by-second animation on the Mac is not guaranteed. At completion, the system must refresh the script to show the celebration; until then a native timer can start counting upward.
 
 For pastel colors on the Mac, choose **System Settings → Desktop & Dock → Widgets → Widget style → Full-color**. Automatic or monochrome styles can mute the colors. Use the medium widget for the compact desktop layout.
+
+## Large widget breakdown
+
+The large Scriptable widget adds a two-row months / weeks / days / hours / minutes / seconds snapshot with an “as of” time. Months use calendar arithmetic with month-end clamping, matching the website; the remaining duration is split into weeks, days, hours, minutes, and seconds. These are component values, not six independent totals.
+
+Custom text cannot tick every second in Scriptable widgets. This snapshot requests a refresh after 15 minutes (or the next day-count transition, if sooner); the operating system may delay it. A separate native timer to the actual completion date remains below the snapshot. Small and medium widgets keep their existing layout. Tap the widget to see the full six-unit countdown updating each second on the website.
