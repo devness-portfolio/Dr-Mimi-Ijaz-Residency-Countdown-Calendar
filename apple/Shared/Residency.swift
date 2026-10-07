@@ -33,3 +33,48 @@ struct Countdown {
         return (0..<8).map { next.addingTimeInterval(Double($0) * 86400) }.filter { $0 <= state.end }
     }
 }
+
+// Widget poses change at half-hour timeline entries; the system controls delivery.
+enum BunnyActivity: String, CaseIterable {
+    case rest, jump, wave, heartbeat, notes, read, eat, tea, stretch, nap, celebrate
+
+    static func at(_ date: Date, complete: Bool) -> BunnyActivity {
+        if complete { return .celebrate }
+        let slot = Int(floor(date.timeIntervalSince1970 / 1800))
+        if slot.isMultiple(of: 2) { return .rest }
+        let actions = allCases.filter { $0 != .rest }
+        return actions[((slot / 2) % actions.count + actions.count) % actions.count]
+    }
+
+    var label: String {
+        switch self {
+        case .rest: return "Doctor bunny resting"
+        case .jump: return "Doctor bunny jumping happily"
+        case .wave: return "Doctor bunny waving"
+        case .heartbeat: return "Doctor bunny checking its heartbeat"
+        case .notes: return "Doctor bunny taking notes"
+        case .read: return "Doctor bunny reading a medical book"
+        case .eat: return "Doctor bunny enjoying a snack"
+        case .tea: return "Doctor bunny sipping tea"
+        case .stretch: return "Doctor bunny stretching"
+        case .nap: return "Doctor bunny napping"
+        case .celebrate: return "Doctor bunny celebrating"
+        }
+    }
+    var message: String {
+        switch self {
+        case .notes, .read: return "You make a difference, Dr. Mimi."
+        case .eat: return "Prescription: a little snack break."
+        case .tea: return "Doctor’s orders: a tiny tea break."
+        case .nap, .stretch: return "A little rest is part of the treatment."
+        case .heartbeat: return "Your kindness is part of the treatment."
+        case .celebrate: return "So proud of you, Dr. Mimi."
+        default: return "One day closer, meri jaan."
+        }
+    }
+    static func refreshDates(after date: Date, timeZone: TimeZone = .current) -> [Date] {
+        let next = (floor(date.timeIntervalSince1970 / 1800) + 1) * 1800
+        let poses = (0..<48).map { Date(timeIntervalSince1970: next + Double($0) * 1800) }
+        return Array(Set(poses + Countdown.refreshDates(after: date, timeZone: timeZone))).sorted()
+    }
+}

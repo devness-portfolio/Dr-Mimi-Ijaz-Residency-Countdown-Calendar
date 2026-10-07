@@ -22,17 +22,21 @@ The Xcode project includes four targets: a native app and widget extension for e
 - Three iPhone Lock Screen formats.
 - Pastel pink, cream, and lavender styling, remaining days, and progress.
 - Automatic celebration text at completion. Large widgets and the app also show the Arabic-first verse and translation.
-- The Mac app bundles the full website: matching pastel cards, doctor bunny, live detailed countdown, and celebration screen, all available offline. Its resizable window uses the website’s phone and desktop layouts.
-- The native iOS companion keeps its compact card and a link to the full website.
-- Accessible progress labels and no Unicode emoji. The Mac app preserves the website’s reduced-motion support for celebration animations.
+- Both apps bundle the full countdown page for offline use, with a cream doctor bunny beside the countdown (layout A), pastel cards, live detailed countdown, and celebration screen.
+- The shared bunny routine rotates through jumping, waving, checking its own heartbeat with a pulsing heart, taking notes, reading, eating, tea, stretching, napping, and celebration. Activities last 5.5 seconds with 8.5-second resting pauses. Each tap or keyboard activation advances to the next activity for 5.5 seconds and changes the encouragement; leaving it alone resumes automatic rotation. Taps also cycle activities after completion while preserving the congratulatory message. Automatic messages appear every third activity.
+- The bunny celebrates 100, 30, 7, and 1 day milestones and residency completion. Reduced Motion keeps poses and messages but disables frame animation. Animation pauses when the app is inactive or the page is hidden.
+- Small, medium, and large native widgets show matching bunny poses beside the day count. Lock Screen widgets retain their compact text/gauge designs. Tapping a widget opens the app for the full routine.
+- Accessible progress labels and no Unicode emoji. Both apps preserve the website’s reduced-motion support for celebration animations.
 
 ## Dates and updates
 
 `Shared/Residency.swift` is the native date configuration: July 1, 2022 through July 1, 2027, at midnight in the device's current timezone. It matches the website's local-midnight behavior and rounded-up elapsed 24-hour days. The website retains its JavaScript configuration; if dates change, update both configurations.
 
-WidgetKit does not run the website or its once-per-second JavaScript timer. The widget supplies future entries at the precise times its displayed whole-day count changes, including completion, and requests a daily reload. The system controls actual presentation and refresh timing, so exact-to-the-second celebration is not guaranteed. Opening the app requests fresh widget timelines after travel/timezone changes. The native iOS companion view refreshes each minute. The Mac app uses the website’s once-per-second countdown.
+WidgetKit does not run the website or its once-per-second JavaScript timer. The widget supplies half-hour pose entries for the next 24 hours, interspersed with resting poses, plus the precise whole-day count changes and completion. It requests a daily reload. Continuous character animation is confined to the app; widget poses depend on system timeline delivery. The system controls actual presentation and refresh timing, so exact-to-the-second celebration is not guaranteed. Opening the app requests fresh widget timelines after travel/timezone changes. Both apps use the website’s once-per-second countdown.
 
-No network is needed for the app or widget countdown. The iOS companion’s website link opens the existing GitHub Pages URL in the browser. The Mac app loads the repository’s `index.html`, `css`, `js`, and `assets` from its app bundle through WKWebView, without fetching the hosted site. These files are referenced directly by the Mac target’s Copy Bundle Resources phase; rebuild the Mac app after website changes. The Mac view uses the dates in `js/countdown.js`; native widgets continue to use `Shared/Residency.swift`. The native app does not sync settings because there are no editable settings.
+No network is needed for the app or widget countdown. Both apps load the repository’s `index.html`, `css`, `js`, and `assets` from their app bundles through WKWebView, without fetching the hosted site. These files are referenced directly by both app targets’ Copy Bundle Resources phase; rebuild both apps after website changes. Both app views use the dates in `js/countdown.js`; native widgets continue to use `Shared/Residency.swift`. The native app does not sync settings because there are no editable settings.
+
+The website and apps share `../js/doctor-bunny.js`. Xcode also bundles that source for document-end injection; the initialization guard ensures only one companion starts, even though the page loads it too. Widget artwork is drawn in `Shared/CountdownCard.swift`, with pose scheduling in `Shared/Residency.swift`.
 
 ## Validation
 
@@ -54,4 +58,4 @@ xcodebuild -project ResidencyCountdown.xcodeproj -scheme ResidencyiOS -sdk iphon
 
 Before device delivery, preview all widget sizes, Lock Screen styles, light/dark/tinted appearances, larger text, and celebration mode. To preview completion, pass a future `Date` into `ResidencyEntry` or `Countdown` in an Xcode preview, keeping production milestones intact.
 
-The countdown checks and an unsigned Debug build of the Mac app and widget extension pass with Xcode 26.3. The Mac bundle includes byte-for-byte copies of the website resources. iOS compilation, signing, and rendered widget previews remain unverified. App icons and App Store/TestFlight packaging are not included in this local-install project.
+The countdown and bunny schedule checks pass, along with unsigned Debug builds of both app/widget pairs. Browser checks cover activity rotation, tap reactions, reduced motion, inactive pause/resume, milestone and completion transitions, and widths 320/390/768/1440. Signing and on-device widget timeline delivery remain unverified. App icons and App Store/TestFlight packaging are not included in this local-install project.

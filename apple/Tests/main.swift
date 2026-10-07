@@ -28,3 +28,16 @@ for zoneName in ["America/Chicago", "America/New_York", "UTC", "Asia/Karachi"] {
     }
 }
 print("Countdown boundary, completion, timezone, DST, progress, and timeline checks passed.")
+
+let sample = Date(timeIntervalSince1970: 1791345600)
+let poses = (0..<40).map { BunnyActivity.at(sample.addingTimeInterval(Double($0) * 1800), complete: false) }
+assert(Set(poses) == Set(BunnyActivity.allCases))
+assert(poses.filter { $0 == .rest }.count == 20)
+assert(BunnyActivity.at(sample, complete: true) == .celebrate)
+let poseDates = BunnyActivity.refreshDates(after: sample)
+assert(poseDates == poseDates.sorted() && Set(poseDates).count == poseDates.count)
+assert(poseDates.allSatisfy { $0 > sample })
+assert(poseDates.first!.timeIntervalSince(sample) <= 1800)
+let completion = Residency.milestones().end
+assert(BunnyActivity.refreshDates(after: completion.addingTimeInterval(-1)).contains(completion))
+print("Bunny pose rotation, resting intervals, completion and timeline ordering checks passed.")

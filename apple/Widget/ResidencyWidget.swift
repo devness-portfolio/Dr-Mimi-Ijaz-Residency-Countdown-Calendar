@@ -12,8 +12,8 @@ struct ResidencyProvider: TimelineProvider {
     }
     func getTimeline(in context: Context, completion: @escaping (Timeline<ResidencyEntry>) -> Void) {
         let now = Date()
-        let entries = ([now] + Countdown.refreshDates(after: now)).map { ResidencyEntry(date: $0) }
-        // Future entries cover delays; daily reloads also pick up timezone changes.
+        let entries = ([now] + BunnyActivity.refreshDates(after: now)).map { ResidencyEntry(date: $0) }
+        // Half-hour poses plus exact day boundaries. WidgetKit controls presentation timing.
         completion(Timeline(entries: entries, policy: .after(now.addingTimeInterval(86400))))
     }
 }

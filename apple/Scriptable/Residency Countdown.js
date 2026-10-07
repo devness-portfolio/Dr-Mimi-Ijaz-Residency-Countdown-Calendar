@@ -1,5 +1,6 @@
 // Residency countdown for the free Scriptable app.
 // Dates use midnight in the device's current timezone, like the website.
+const WEBSITE_URL = "https://devness-portfolio.github.io/Dr-Mimi-Ijaz-Residency-Countdown-Calendar/";
 const START = new Date(2022, 6, 1, 0, 0, 0);
 const END = new Date(2027, 6, 1, 0, 0, 0);
 const COLORS = {
@@ -100,7 +101,7 @@ backdrop.startPoint = new Point(0, 0);
 backdrop.endPoint = new Point(1, 1);
 widget.backgroundGradient = backdrop;
 widget.setPadding(8, 8, 8, 8);
-widget.url = "https://devness-portfolio.github.io/Dr-Mimi-Ijaz-Residency-Countdown-Calendar/";
+widget.url = WEBSITE_URL;
 
 const card = widget.addStack();
 card.layoutVertically();
@@ -255,5 +256,7 @@ if (!state.complete) {
     ? new Date(Math.min(nextChange.getTime(), now.getTime() + 15 * 60 * 1000))
     : nextChange;
 }
+// Home Screen widgets are snapshots. Open the full interactive bunny when run in-app.
 Script.setWidget(widget);
+if (config.runsInApp) await Safari.openInApp(WEBSITE_URL, true);
 Script.complete();

@@ -11,7 +11,9 @@ This widget runs inside the existing **Scriptable** app. You do not need Xcode, 
 5. Find **Scriptable**, choose a small, medium, or large widget, and add it.
 6. Touch and hold the added widget, choose **Edit Widget**, and select `Residency Countdown` as its script.
 
-The script uses the phone's local timezone and the website's July 1, 2022 to July 1, 2027 dates. Tapping the widget opens the full countdown website. Scriptable widgets refresh under iOS's schedule, so the number can update a little after midnight. The separate native timer shows total hours, minutes, and seconds remaining. Scriptable uses the system timer presentation, so its formatting and visible update cadence are controlled by the operating system. The day count and percentage update when the script refreshes.
+The script uses the phone's local timezone and the website's July 1, 2022 to July 1, 2027 dates. Tapping the widget opens the full countdown website. Running the script inside Scriptable also opens the website in an in-app browser. There, each bunny tap plays the next activity and changes the encouragement; automatic rotation resumes when left alone. The interactive website requires a network connection and the updated website to be deployed. Scriptable widgets refresh under iOS's schedule, so the number can update a little after midnight. The separate native timer shows total hours, minutes, and seconds remaining. Scriptable uses the system timer presentation, so its formatting and visible update cadence are controlled by the operating system. The day count and percentage update when the script refreshes.
+
+The Home Screen widget itself remains a static rendering: Scriptable does not expose browser-style animation or an in-place bunny click handler in `ListWidget`. Its countdown drawing still works offline. See [Scriptable’s widget documentation](https://docs.scriptable.app/listwidget/).
 
 ## Show that iPhone widget on the Mac
 
@@ -40,3 +42,5 @@ All countdown sizes retain a separate native timer using `WidgetDate.applyTimerS
 ## Validation
 
 The JavaScript was syntax-checked and exercised with Scriptable API mocks across small, medium, and large countdown and celebration states. This checks script execution, text, native timer dates, and refresh scheduling; it does not substitute for a visual check in Scriptable on an iPhone or a mirrored Mac widget.
+
+The tap-through update was checked with 50 mocked widget/in-app runs across five size configurations and five dates. These verify that only in-app runs open the browser and that widget countdown, celebration, native timer, artwork execution, and refresh scheduling remain intact. Actual iPhone browser presentation remains to be checked.
