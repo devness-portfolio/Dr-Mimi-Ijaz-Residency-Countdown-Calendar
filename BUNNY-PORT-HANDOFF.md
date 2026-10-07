@@ -1,6 +1,6 @@
 # Handoff: doctor bunny for Scriptable and GitHub Pages
 
-> Implementation update: the web/native companion now lives in `js/doctor-bunny.js`; both platforms use it. Taps advance through the activity sequence for 5.5 seconds instead of the old 2.2-second `react` state. Scriptable now opens the interactive website when run in-app as well as on widget tap; its Home Screen artwork remains static. The broader widget pose port below is historical planning, not completed work. Native builds and local browser tests do not imply installation or GitHub Pages deployment.
+> Implementation update: the web/native companion now lives in `js/doctor-bunny.js`; both platforms use it. Taps advance through the activity sequence for 5.5 seconds instead of the old 2.2-second `react` state. Scriptable now opens the interactive website when run in-app as well as on widget tap; its Home Screen artwork remains static. The Scriptable pose port is now implemented: all sizes use bunny-left countdown layout, ten action poses alternate with rest at half-hour slots, medium/large show encouragement, and refresh requests include pose/day/detail boundaries. Completion uses a steady celebration pose. Node API mocks verify execution and scheduling; real iPhone/Mac widget layout and refresh delivery remain unverified. The detailed instructions below record the original plan. Native builds and local browser tests do not imply installation or GitHub Pages deployment.
 
 ## Objective and scope
 
@@ -31,7 +31,7 @@ Website URL configured in the project: [Dr. Mimi Ijaz’s Residency Countdown](h
 | --- | --- |
 | `AGENTS.md` | Project requirements: static site, no emoji, accessibility, date behavior, testing. Read first. |
 | `assets/bunny.svg` | Original character identity and vector geometry. Preserve it as the reference and fallback. |
-| `apple/App/doctor-bunny.js` | Working browser-compatible animation, drawing, message, interaction, and lifecycle implementation. Primary porting source. |
+| `js/doctor-bunny.js` | Shared browser-compatible animation, drawing, message, interaction, and lifecycle implementation. Primary porting source. |
 | `apple/App/ResidencyApp.swift` | Loads the bundled website in WKWebView and injects the bunny script into both apps. Sends the `bunny-app-active` lifecycle event. |
 | `apple/Shared/CountdownCard.swift` | `DoctorBunny` native vector drawing and approved side-by-side widget arrangement. |
 | `apple/Shared/Residency.swift` | `BunnyActivity`, pose selection, encouragement, and native widget refresh scheduling. |

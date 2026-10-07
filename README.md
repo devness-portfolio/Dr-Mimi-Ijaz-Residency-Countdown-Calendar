@@ -22,7 +22,7 @@ Both native apps present the bundled website in an offline `WKWebView`, so the c
 
 ![Design mockup of the iOS, macOS, and Scriptable residency widgets with the doctor bunny](screenshots/widget-mockup.png)
 
-*Concept mockup — not a device capture.* The WidgetKit and Scriptable versions are system-refreshing snapshots with the doctor bunny; opening either takes you to the full live countdown.
+*Concept mockup — not a device capture.* The WidgetKit and Scriptable versions rotate static doctor bunny poses on system refresh; opening either takes you to the full live countdown.
 
 ## Run locally
 

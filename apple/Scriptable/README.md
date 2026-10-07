@@ -13,7 +13,7 @@ This widget runs inside the existing **Scriptable** app. You do not need Xcode, 
 
 The script uses the phone's local timezone and the website's July 1, 2022 to July 1, 2027 dates. Tapping the widget opens the full countdown website. Running the script inside Scriptable also opens the website in an in-app browser. There, each bunny tap plays the next activity and changes the encouragement; automatic rotation resumes when left alone. The interactive website requires a network connection and the updated website to be deployed. Scriptable widgets refresh under iOS's schedule, so the number can update a little after midnight. The separate native timer shows total hours, minutes, and seconds remaining. Scriptable uses the system timer presentation, so its formatting and visible update cadence are controlled by the operating system. The day count and percentage update when the script refreshes.
 
-The Home Screen widget itself remains a static rendering: Scriptable does not expose browser-style animation or an in-place bunny click handler in `ListWidget`. Its countdown drawing still works offline. See [Scriptable’s widget documentation](https://docs.scriptable.app/listwidget/).
+The Home Screen widget rotates static poses at system refresh: Scriptable does not expose browser-style animation or an in-place bunny click handler in `ListWidget`. Its countdown drawing still works offline. See [Scriptable’s widget documentation](https://docs.scriptable.app/listwidget/).
 
 ## Show that iPhone widget on the Mac
 
@@ -29,13 +29,13 @@ On or after July 1, 2027, the widget changes to `YOU DID IT!`, the congratulatio
 
 Replace the contents of your existing `Residency Countdown` script in Scriptable with the updated JavaScript file and run it once. Keep the same script selected in your widgets. The widget now uses the website’s cream card, pink/lavender background, Georgia countdown numbers, pastel detail tiles, and progress bar.
 
-The medium and large countdown widgets include the doctor bunny from `assets/bunny.svg`, translated into local drawing commands inside the script. No image downloads, companion files, or network connection are needed to render it. Small widgets prioritize the day count, live timer, and progress. Celebration layouts retain the personal messages, with an Arabic-first verse panel on medium and large widgets.
+Every countdown size places the doctor bunny on the left beside the day count. Its original geometry from `assets/bunny.svg` and activity props are drawn locally inside the script. Poses alternate resting half-hour slots with jumping, waving, heartbeat checks, notes, reading, snacks, tea, stretching, napping, and celebration. Medium and large widgets show short activity-specific encouragement. No image downloads, companion files, or network connection are needed to render it. Celebration layouts retain the personal messages, with an Arabic-first verse panel on medium and large widgets.
 
 For pastel colors on the Mac, choose **System Settings → Desktop & Dock → Widgets → Widget style → Full-color**. Automatic or monochrome styles can mute the colors.
 
 ## Live timer and large widget breakdown
 
-The large widget includes two rows of pink, lavender, and cream tiles for months / weeks / days / hours / minutes / seconds, with an “as of” time. Months use calendar arithmetic with month-end clamping, matching the website. These are component values, not six independent totals. Custom text cannot tick every second in Scriptable widgets. This snapshot requests a refresh after 15 minutes (or the next day-count transition, if sooner); the operating system may delay it.
+The large widget includes two rows of pink, lavender, and cream tiles for months / weeks / days / hours / minutes / seconds, with an “as of” time. Months use calendar arithmetic with month-end clamping, matching the website. These are component values, not six independent totals. Custom text cannot tick every second in Scriptable widgets. The next refresh request is the earliest of the next half-hour pose boundary, the next day-count transition, and (for large widgets) 15 minutes. The operating system may delay it. Completion uses a steady celebration pose.
 
 All countdown sizes retain a separate native timer using `WidgetDate.applyTimerStyle()` with the actual completion date. It shows total hours, minutes, and seconds independently of script refreshes. Mirrored widgets on macOS may update less frequently. At completion, the system must refresh the script to show the celebration; until then a native timer can start counting upward. Tap the widget for the full website, including its live six-unit countdown and animated celebration.
 
@@ -44,3 +44,5 @@ All countdown sizes retain a separate native timer using `WidgetDate.applyTimerS
 The JavaScript was syntax-checked and exercised with Scriptable API mocks across small, medium, and large countdown and celebration states. This checks script execution, text, native timer dates, and refresh scheduling; it does not substitute for a visual check in Scriptable on an iPhone or a mirrored Mac widget.
 
 The tap-through update was checked with 50 mocked widget/in-app runs across five size configurations and five dates. These verify that only in-app runs open the browser and that widget countdown, celebration, native timer, artwork execution, and refresh scheduling remain intact. Actual iPhone browser presentation remains to be checked.
+
+The remaining pose port was checked with `node apple/Tests/scriptable.cjs`: 50 widget/in-app runs, 11 distinct vector drawings, 40 half-hour slots, completion overrides, and nonnegative countdown/progress bounds. Actual small-widget fit, timer presentation, tap routing, mirrored Mac appearance, and refresh delivery still need device checks. Existing installations must replace their saved script with this file and run it once.

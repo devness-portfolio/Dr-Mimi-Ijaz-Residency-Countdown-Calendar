@@ -36,10 +36,28 @@ function calculateCountdown(now, start = START, end = END) {
 }
 
 
+const BUNNY_ACTIONS = ["jump", "wave", "heartbeat", "notes", "read", "eat", "tea", "stretch", "nap", "celebrate"];
+function activityForDate(now, complete) {
+  if (complete) return "celebrate";
+  const slot = Math.floor(now.getTime() / 1800000);
+  return slot % 2 === 0 ? "rest" : BUNNY_ACTIONS[((Math.floor(slot / 2) % BUNNY_ACTIONS.length) + BUNNY_ACTIONS.length) % BUNNY_ACTIONS.length];
+}
+function bunnyMessage(activity, now) {
+  const messages = {
+    jump: "One day closer to your next chapter.", wave: "Hello, my favorite doctor.",
+    heartbeat: "Your kindness is part of the treatment.", notes: "Doctor’s note: you are doing beautifully.",
+    read: "You make a difference, Dr. Mimi.", eat: "Prescription: a little snack break.",
+    tea: "Doctor’s orders: a tiny tea break.", stretch: "Unclench your shoulders, meri jaan.",
+    nap: "A little rest is part of the treatment.", celebrate: "So proud of you, Dr. Mimi."
+  };
+  const rests = ["One day at a time, meri jaan.", "So proud of you. Always.", "Your best is enough today."];
+  return messages[activity] || rests[((Math.floor(now.getTime() / 3600000) % rests.length) + rests.length) % rests.length];
+}
+
 // Vector geometry from assets/bunny.svg, drawn locally: no downloads or extra files.
-function doctorBunny() {
+function doctorBunny(activity = "rest") {
   const canvas = new DrawContext();
-  canvas.size = new Size(180, 203);
+  canvas.size = new Size(180, 220);
   canvas.opaque = false;
   canvas.respectScreenScale = true;
   const shapes = [
@@ -61,9 +79,24 @@ function doctorBunny() {
     ["#cf92aa","none",1.0,[["M",128.0,67.0],["C",113.0,57.0,127.0,49.0,132.0,57.0],["C",140.0,49.0,150.0,61.0,128.0,67.0]]],
     ["#dfba77","none",1.0,[["M",20.0,83.0],["L",23.0,91.0],["L",31.0,94.0],["L",23.0,97.0],["L",20.0,105.0],["L",17.0,97.0],["L",9.0,94.0],["L",17.0,91.0],["Z"]]],
   ];
-  for (const [fill, stroke, width, commands] of shapes) {
+  // Leave headroom for the raised hop and long ears. The ground stays still.
+  const offsetY = activity === "jump" || activity === "celebrate" ? 4 : 16;
+  const raised = activity === "stretch" || activity === "celebrate";
+  shapes[3] = ["#fff9ee", "#886a76", 2.5, [
+    ["E", 27, raised ? 76 : 125, 24, 38],
+    ["E", 130, raised ? 76 : activity === "wave" ? 87 : 125, 24, 38]
+  ]];
+  if (activity === "nap") shapes[11] = ["none", "#655460", 2, [
+    ["M",61,88],["Q",65,94,69,88],["M",111,88],["Q",115,94,119,88]
+  ]];
+  if (activity === "heartbeat") {
+    shapes[9][3] = [["M",72,119],["L",72,141],["Q",73,154,83,154],["Q",94,154,94,142],["L",94,129],["M",118,122],["L",108,137]];
+    shapes[10][3] = [["E",102,132,12,12]];
+  }
+  function paint(fill, stroke, width, commands, yOffset = offsetY) {
     const path = new Path();
-    for (const [command, ...v] of commands) {
+    for (const [command, ...coords] of commands) {
+      const v = coords.map((value, index) => index % 2 === 1 && !(command === "E" && index === 3) ? value + yOffset : value);
       switch (command) {
         case "M": path.move(new Point(v[0], v[1])); break;
         case "L": path.addLine(new Point(v[0], v[1])); break;
@@ -85,11 +118,45 @@ function doctorBunny() {
       canvas.strokePath();
     }
   }
+  shapes.forEach(([fill, stroke, width, commands], index) => paint(fill, stroke, width, commands, index === 0 ? 16 : offsetY));
+  function ellipse(x,y,w,h,fill = "#fff9ee") { paint(fill,"#886a76",2,[["E",x,y,w,h]]); }
+  function line(points, color = "#886a76", width = 2) { paint("none",color,width,points.map(([x,y],i)=>[i ? "L" : "M",x,y])); }
+  function box(x,y,w,h,fill) { paint(fill,"#886a76",2,[["M",x,y],["L",x+w,y],["L",x+w,y+h],["L",x,y+h],["Z"]]); }
+  function heart(x,y) { paint("#cf92aa","none",1,[["M",x,y],["C",x-18,y-12,x-5,y-24,x,y-15],["C",x+5,y-24,x+18,y-12,x,y]]); }
+  if (activity === "heartbeat") { ellipse(112,133,20,15); heart(151,70); }
+  if (activity === "notes") {
+    box(78,135,40,40,"#faf4e8"); box(89,131,17,7,"#dbc8e4");
+    for (let y=148;y<170;y+=7) line([[85,y],[109,y]],"#baa4b5",1);
+    line([[125,139],[104,161]],"#bd678d",4); ellipse(118,140,17,14);
+  }
+  if (activity === "read") {
+    box(61,140,60,35,"#e1dcec"); line([[91,140],[91,175]]);
+    for (let y=148;y<170;y+=7) { line([[67,y],[85,y]],"#baa4b5",1); line([[97,y],[115,y]],"#baa4b5",1); }
+    ellipse(53,150,16,20); ellipse(117,150,16,20);
+  }
+  if (activity === "eat") {
+    ellipse(97,108,29,27,"#dfba77");
+    for (const [x,y] of [[102,115],[113,122],[106,127]]) ellipse(x,y,3,3,"#886a76");
+    ellipse(118,106,10,10); ellipse(121,124,17,14);
+  }
+  if (activity === "tea") {
+    ellipse(113,121,18,17,"#ffffff"); box(83,115,34,28,"#efbfd0");
+    line([[107,115],[110,130]],"#886a76",1); box(106,130,7,8,"#fff9ee");
+    line([[92,109],[88,102],[93,95]],"#baa4b5",1.5); ellipse(73,127,18,15); ellipse(113,135,18,15);
+  }
+  if (activity === "nap") {
+    // Draw lettering locally too: no browser canvas or font downloads.
+    line([[145,39],[157,39],[145,51],[157,51]]);
+    line([[160,24],[168,24],[160,32],[168,32]],"#886a76",1.5);
+  }
+  if (activity === "stretch") { line([[22,71],[17,64]],"#cf92aa"); line([[157,71],[163,64]],"#cf92aa"); }
+  if (activity === "celebrate") { heart(24,68); heart(154,64); }
   return canvas.getImage();
 }
 
 const now = new Date();
 const state = calculateCountdown(now);
+const activity = activityForDate(now, state.complete);
 const family = config.widgetFamily || "large";
 const small = family === "small";
 const large = family === "large" || family === "extraLarge";
@@ -128,8 +195,8 @@ function centered(parent, value, size, color = COLORS.ink, serif = false) {
   return label;
 }
 function bunny(parent, height) {
-  const image = parent.addImage(doctorBunny());
-  image.imageSize = new Size(height * 180 / 203, height);
+  const image = parent.addImage(doctorBunny(activity));
+  image.imageSize = new Size(height * 180 / 220, height);
   image.applyFittingContentMode();
 }
 function progressBar(parent, value) {
@@ -173,10 +240,21 @@ if (!state.complete || small || large) {
 }
 
 if (state.complete) {
-  centered(card, "YOU DID IT!", large ? 30 : small ? 19 : 23, COLORS.pink, true);
-  const congratulations = centered(card, "Congratulations Meri Jaan!!", large ? 15 : 11);
+  let celebrationText = card;
+  if (!small && !large) {
+    const hero = card.addStack();
+    hero.centerAlignContent();
+    hero.addSpacer();
+    bunny(hero, 46);
+    hero.addSpacer(8);
+    celebrationText = hero.addStack();
+    celebrationText.layoutVertically();
+    hero.addSpacer();
+  }
+  centered(celebrationText, "YOU DID IT!", large ? 30 : small ? 19 : 23, COLORS.pink, true);
+  const congratulations = centered(celebrationText, "Congratulations Meri Jaan!!", large ? 15 : 11);
   congratulations.lineLimit = small ? 2 : 1;
-  centered(card, "Alhamdulillah", large ? 13 : 10, COLORS.muted);
+  centered(celebrationText, "Alhamdulillah", large ? 13 : 10, COLORS.muted);
   if (large || small) {
     card.addSpacer(large ? 8 : 2);
     const art = card.addStack();
@@ -204,14 +282,12 @@ if (state.complete) {
   const hero = card.addStack();
   hero.centerAlignContent();
   hero.addSpacer();
+  bunny(hero, large ? 70 : small ? 48 : 58);
+  hero.addSpacer(small ? 5 : 12);
   const count = hero.addStack();
   count.layoutVertically();
   centered(count, state.totalDays.toLocaleString(), large ? 46 : small ? 32 : 34, COLORS.pink, true);
   centered(count, "days left", small ? 10 : 12);
-  if (!small) {
-    hero.addSpacer(14);
-    bunny(hero, large ? 64 : 52);
-  }
   hero.addSpacer();
   card.addSpacer(4);
   if (large) {
@@ -244,17 +320,17 @@ if (state.complete) {
   progressBar(card, state.progress / 100);
   card.addSpacer(3);
   centered(card, `${(Math.floor(state.progress * 10) / 10).toFixed(1)}% complete`, 9, COLORS.muted);
-  if (large) {
-    card.addSpacer();
-    centered(card, "One day at a time, meri jaan.", 11, COLORS.pink, true);
+  if (!small) {
+    card.addSpacer(large ? 4 : 2);
+    const message = centered(card, bunnyMessage(activity, now), large ? 11 : 9, COLORS.pink, true);
+    message.lineLimit = 2;
   }
 }
 
 if (!state.complete) {
   const nextChange = new Date(END.getTime() - Math.max(0, state.totalDays - 1) * 86400000);
-  widget.refreshAfterDate = large
-    ? new Date(Math.min(nextChange.getTime(), now.getTime() + 15 * 60 * 1000))
-    : nextChange;
+  const nextPose = (Math.floor(now.getTime() / 1800000) + 1) * 1800000;
+  widget.refreshAfterDate = new Date(Math.min(nextChange.getTime(), nextPose, large ? now.getTime() + 900000 : Infinity));
 }
 // Home Screen widgets are snapshots. Open the full interactive bunny when run in-app.
 Script.setWidget(widget);
