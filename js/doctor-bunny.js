@@ -31,15 +31,34 @@
   const live = document.createElement('span'); live.setAttribute('role', 'status');
   live.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)';
   button.after(live); hero.after(message);
-  const messages = ['One day at a time, meri jaan.', 'You make a difference, Dr. Mimi.',
-    'Prescription: a snack and a little self-kindness.', 'Your kindness is part of the treatment.',
-    'A little rest is part of the treatment.', 'So proud of you. Always.',
-    'Doctor’s orders: take a tiny tea break.', 'One day closer to your next chapter.'];
-  const activities = ['jump','wave','heartbeat','notes','read','eat','tea','stretch','nap','celebrate'];
+  const encouragements = ['One day at a time, meri jaan.', 'You make a difference, Dr. Mimi.',
+    'Your kindness is part of the treatment.', 'So proud of you. Always.',
+    'One day closer to your next chapter.', 'Mimi, you are somebody’s reason to feel hopeful.',
+    'A little reminder: you are loved beyond measure.', 'You have a heart of gold and a very busy pager.',
+    'Meri Jaan, your best is enough today.', 'Prognosis: a beautiful future ahead.'];
+  const activityMessages = {
+    jump: ['Little wins deserve a little happy hop.', 'Your next chapter is getting closer, Mimi!'],
+    wave: ['Hello, my favorite doctor.', 'Sending you a little love between rounds.'],
+    heartbeat: ['Your kindness is part of the treatment.', 'A heart of gold. No stethoscope needed to know.'],
+    notes: ['Doctor’s note: you are doing beautifully.', 'Assessment: brilliant. Plan: keep believing in yourself.'],
+    read: ['One page, one patient, one day at a time.', 'Studying hard, shining brighter.'],
+    eat: ['Prescription: a snack and a little self-kindness.', 'Even the best doctors need a snack break.'],
+    tea: ['Doctor’s orders: take a tiny tea break.', 'A warm cup of tea and a moment just for you, meri jaan.'],
+    stretch: ['Unclench your shoulders, meri jaan.', 'A little stretch between big things.'],
+    nap: ['You deserve some rest, meri jaan.', 'A little rest is part of the treatment.'],
+    celebrate: ['So proud of you. Every little win counts.', 'Dr. Mimi, you give us so much to celebrate.'],
+    coffee: ['Coffee break, Dr. Mimi. You’ve earned it.', 'A little coffee before the next chapter.'],
+    hotDrink: ['Tiny sip. Big feelings. Let it cool, meri jaan.', 'Prescription: patience. That cup is still hot!']
+  };
+  // Keep the hot-cup story between unrelated actions so it reads as its own scene.
+  const activities = ['jump','wave','heartbeat','notes','read','eat','tea','stretch','nap','coffee','celebrate','hotDrink'];
+  const drinkActivities = ['tea','coffee','hotDrink'];
+  const messageTurns = {};
+  const specificActivities = ['tea','coffee','hotDrink','nap','eat','stretch'];
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let activity = 'rest', index = 0, messageIndex = 0, started = performance.now();
   let timer, frame, active = true, finished = false, milestone = null;
-  message.textContent = messages[0];
+  message.textContent = encouragements[0];
   const ink = '#886a76', cream = '#fff9ee', pink = '#f3c0cf', lavender = '#e1dcec';
   function ellipse(x,y,rx,ry,fill,stroke=ink) {
     ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();
@@ -65,7 +84,12 @@
   function text(value,x,y,size=13) {ctx.fillStyle=ink;ctx.font=`${size}px Georgia`;ctx.fillText(value,x,y);}
   function draw(now=performance.now()) {
     frame = undefined;
-    const t = motion.matches ? 0 : (now-started)/1000;
+    const t = motion.matches ? (activity==='hotDrink'?2.8:drinkActivities.includes(activity)?2:0) : (now-started)/1000;
+    const drinking = drinkActivities.includes(activity);
+    // One lift, sip, and lower within the existing 5.5-second activity window.
+    const sip = drinking ? Math.max(0, Math.min(1, (t-.4)/1.1, (4.2-t)/1.1)) : 0;
+    const burned = activity==='hotDrink' && t>=1.7 && t<3.7;
+    const recovering = activity==='hotDrink' && t>=3.7 && t<4.6;
     const wiggle = Math.sin(t*5), slow = Math.sin(t*2);
     ctx.setTransform(2,0,0,2,0,0);ctx.clearRect(0,0,180,220);ctx.translate(0,14);
     ellipse(90,185,58,7,'#e8d9e7',null);
@@ -80,7 +104,7 @@
     ellipse(66,174,18,10,cream);ellipse(115,174,18,10,cream);
     const raised = activity==='stretch'||activity==='celebrate';
     ellipse(43,raised?97+slow*5:136,12,22,cream);
-    ellipse(137,raised?95+slow*5:activity==='wave'?107+wiggle*7:136,12,22,cream);
+    if(!drinking) ellipse(137,raised?95+slow*5:activity==='wave'?107+wiggle*7:136,12,22,cream);
     shape('M57 116Q40 132 46 178Q91 190 135 178Q139 136 123 115','#fff');
     ctx.beginPath();ctx.moveTo(71,113);ctx.lineTo(109,113);ctx.lineTo(90,143);ctx.closePath();ctx.fillStyle=lavender;ctx.fill();
     line([[67,119],[64,138],[77,144],[69,151],[84,170]],'#d8c9d4',2);
@@ -90,9 +114,19 @@
     ellipse(59,103,10,6,pink,null);ellipse(123,103,10,6,pink,null);
     shape('M128 67C113 57 127 49 132 57C140 49 150 61 128 67','#cf92aa',null);
     const closed=activity==='nap'||(activity==='rest'&&t%5>4.8);
-    if(closed){line([[61,88],[65,91],[69,88]],ink,2);line([[111,88],[115,91],[119,88]],ink,2);}
+    if(burned){line([[60,94],[65,88],[70,94]],ink,2);line([[110,94],[115,88],[120,94]],ink,2);line([[60,81],[70,84]],ink,2);line([[110,84],[120,81]],ink,2);}
+    else if(closed){line([[61,88],[65,91],[69,88]],ink,2);line([[111,88],[115,91],[119,88]],ink,2);}
     else {line([[65,88],[65,93]],'#655460',4);line([[115,88],[115,93]],'#655460',4);}
-    shape('M85 99Q90 104 95 99M90 104V109M90 109Q85 113 81 108M90 109Q95 113 99 108',null,ink,2);
+    shape('M85 99Q90 104 95 99',null,ink,2);
+    if(burned){
+      ellipse(90,110,7,4,'#655460',null);
+      shape('M86 110L86 117Q90 122 94 117L94 110','#ef9fae',ink,1.5);
+      line([[90,113],[90,117]],'#cf8298',1);
+      const tearY=99+Math.min(12,(t-1.7)*8);
+      shape(`M119 ${tearY-5}Q111 ${tearY+5} 119 ${tearY+7}Q126 ${tearY+5} 119 ${tearY-5}`,'#b9dce7',null);
+    } else if(recovering){line([[84,110],[96,110]],ink,2);}
+    else if(drinking&&sip>.8){ellipse(90,110,4,3,ink,null);}
+    else shape('M90 104V109M90 109Q85 113 81 108M90 109Q95 113 99 108',null,ink,2);
     // A stethoscope stays on the coat, with its chestpiece lifted for the exam.
     line([[70,118],[70,137],[75,144],[83,144],[88,137],[88,124]],'#87768d',3);
     line([[114,120],[114,activity==='heartbeat'?133:148]],'#87768d',3);
@@ -101,14 +135,46 @@
     if(activity==='notes') {box(82,133,38,43,'#faf4e8');box(93,130,16,6,'#dbc8e4',2);for(let y=146;y<168;y+=7)line([[89,y],[110,y]],'#baa4b5',1);line([[119+wiggle*2,141],[105+wiggle*2,159]],'#bd678d',4);ellipse(126,143,9,7,cream);}
     if(activity==='read') {box(62,139,58,36,lavender);line([[91,140],[91,174]],ink,2);for(let y=148;y<168;y+=7){line([[68,y],[85,y]],'#b2a3c1',1);line([[98,y],[114,y]],'#b2a3c1',1);}text('+',102,153,15);line([[91,141],[91+Math.abs(slow)*17,144],[91+Math.abs(slow)*17,170],[91,174]],'#b2a3c1',1);ellipse(61,155,8,10,cream);ellipse(124,155,8,10,cream);}
     if(activity==='eat'){ellipse(90,110,3,1.5+Math.abs(wiggle)*2,ink,null);const y=116+slow*4;ellipse(110,y,15,14,'#dfba77');for(const [x,dy] of [[104,-4],[113,3],[108,8]])ellipse(x,y+dy,2,2,ink,null);ellipse(121,y+4,9,7,cream);ellipse(120,y-9,5,5,'#fff9ee',null);}
-    if(activity==='tea'){const y=132+slow*3;ellipse(116,y+12,10,10,'#fff',ink);box(76,y,39,28,'#efbfd0',7);ellipse(76,y+16,8,9,cream);ellipse(112,y+16,8,9,cream);line([[88,y-4],[85+slow*2,y-11],[89,y-18]],'#baa4b5',1.5);}
+    if(drinking){
+      // During the mishap the cup drops away while the free paw fans the tongue.
+      const lift=activity==='hotDrink'&&t>=1.7 ? Math.max(0,1-(t-1.7)/.35) : sip;
+      const x=76+(activity==='hotDrink'&&t>=1.7?22*(1-lift):0), y=138-29*lift;
+      const coffee=activity==='coffee';
+      line([[52,139],[x-2,y+13]],ink,3);
+      ellipse(x+38,y+11,8,8,'#fff',ink);
+      box(x,y,32,24,coffee?'#dfc4a1':activity==='hotDrink'?'#e1dcec':'#efbfd0',6);
+      ellipse(x+16,y+2,12,2,coffee?'#765541':'#b3bd8c',null);
+      if(coffee){line([[x+10,y+11],[x+22,y+11]],'#fff9ee',2);}
+      else if(activity==='tea'){line([[x+25,y+3],[x+26,y+13]],ink,1);box(x+23,y+13,6,7,'#fff9ee',1);}
+      else {text('!',x+14,y+17,13);}
+      ellipse(x-2,y+14,8,9,cream);
+      if(burned){
+        const fan=motion.matches?0:Math.sin(t*25);
+        const pawX=110+fan*7, pawY=116+Math.abs(fan)*3;
+        line([[136,138],[pawX,pawY]],ink,3);ellipse(pawX,pawY,9,7,cream);
+        line([[pawX+12,pawY-5],[pawX+18,pawY-8]],'#baa4b5',1);
+        line([[pawX+13,pawY+1],[pawX+20,pawY+1]],'#baa4b5',1);
+      }else {line([[134,138],[x+32,y+14]],ink,3);ellipse(x+32,y+14,8,9,cream);}
+      line([[x+12,y-5],[x+9+slow*2,y-11],[x+13,y-17]],'#baa4b5',1.5);
+      if(coffee)line([[x+22,y-5],[x+25+slow*2,y-11],[x+22,y-17]],'#baa4b5',1.5);
+    }
     if(activity==='stretch'){line([[27,84],[23,78]],'#cf92aa',2);line([[149,82],[155,75]],'#cf92aa',2);}
     if(activity==='nap'){text('Z',138,49+slow*2,17);text('z',151,35+slow*3,12);}
     if(activity==='celebrate'){heart(33,65,.7);heart(147,57,.8);for(let i=0;i<5;i++){ctx.fillStyle=i%2?pink:lavender;ctx.fillRect(20+i*34,22+(i%2)*9+slow*3,4,7);}}
     ctx.restore();
     if(!motion.matches && active && !document.hidden) frame=requestAnimationFrame(draw);
   }
-  function setActivity(next){activity=next;button.dataset.activity=next;started=performance.now();if(frame)cancelAnimationFrame(frame);draw();}
+  function chooseMessage(next){
+    if(finished) return 'You did it, Dr. Mimi. So proud of you!';
+    const turn=messageIndex++;
+    if(next==='rest') return encouragements[turn%encouragements.length];
+    const pool=activityMessages[next];
+    if(!specificActivities.includes(next)&&turn%3===0) return encouragements[turn%encouragements.length];
+    const visit=messageTurns[next]||0;
+    messageTurns[next]=visit+1;
+    return pool[visit%pool.length];
+  }
+  function setActivity(next){activity=next;message.textContent=chooseMessage(next);button.dataset.activity=next;started=performance.now();if(frame)cancelAnimationFrame(frame);draw();}
   function schedule(delay=7000){clearTimeout(timer);if(active&&!document.hidden)timer=setTimeout(advance,delay);}
   // Taps and automatic activities share a cursor, so a tap always moves forward.
   function nextActivity(){
@@ -119,13 +185,11 @@
   function advance(){
     if(activity==='rest'){
       setActivity(finished?'celebrate':nextActivity());
-      if(!finished&&index%3===0){message.textContent=messages[++messageIndex%messages.length];}
       schedule(5500);
     } else {setActivity('rest');schedule(8500);}
   }
   button.addEventListener('click',()=>{
-    message.textContent=finished?'You did it, Dr. Mimi. So proud of you!':messages[++messageIndex%messages.length];
-    live.textContent=message.textContent;setActivity(nextActivity());schedule(5500);
+    setActivity(nextActivity());live.textContent=message.textContent;schedule(5500);
   });
   function visibility(){
     clearTimeout(timer);if(frame)cancelAnimationFrame(frame);
@@ -140,7 +204,7 @@
       finished=true;const art=document.querySelector('.celebration-art');art.querySelector('img')?.remove();
       art.prepend(button);button.after(live);art.after(message);message.textContent='You did it, Dr. Mimi. So proud of you!';setActivity('celebrate');schedule(5500);
     } else if(!finished&&[100,30,7,1].includes(Number(document.getElementById('total-days').textContent))&&milestone!==Number(document.getElementById('total-days').textContent)){
-      milestone=Number(document.getElementById('total-days').textContent);message.textContent='Another beautiful milestone, Dr. Mimi!';setActivity('celebrate');schedule(5500);
+      milestone=Number(document.getElementById('total-days').textContent);setActivity('celebrate');message.textContent='Another beautiful milestone, Dr. Mimi!';schedule(5500);
     }
   }
   new MutationObserver(checkMilestone).observe(countdown,{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true});

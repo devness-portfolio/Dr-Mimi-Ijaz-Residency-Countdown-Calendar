@@ -33,7 +33,9 @@ For development, temporarily set `RESIDENCY_END` to a near-future or past date, 
 
 ## Doctor bunny
 
-Click, tap, or keyboard-activate the bunny to play the next activity and show a new encouragement message. Activities cycle through jumping, waving, heartbeat check, notes, reading, eating, tea, stretching, napping, and celebration. Each runs for 5.5 seconds; leaving it alone resumes automatic rotation with 8.5-second resting pauses. Rapid taps replace the current activity without stacking timers. Completion keeps the congratulatory message, while taps still explore the activities.
+Click, tap, or keyboard-activate the bunny to play the next activity and show a new message. Twelve distinct actions cycle through jumping, waving, heartbeat check, notes, reading, eating, sipping tea, stretching, napping, sipping coffee, celebration, and a hot-drink mishap. Tea has a pink cup with a tea tag; coffee has a tan cup and darker drink. Both lift to the mouth for a sip. The separate hot-cup scene includes a surprised face, one tear, tongue out, a fanning paw, and recovery, with unrelated celebration and jumping actions on either side.
+
+Activity-specific reminders stay paired with their actions (including tea, coffee, snacks, stretching, and sleep). Other actions mix fitting messages with affectionate affirmations and gentle doctor puns. Resting pauses show general encouragement instead of carrying over a drink or sleep reminder. Each action runs for 5.5 seconds; leaving it alone resumes automatic rotation with 8.5-second resting pauses. Rapid taps replace the current activity without stacking timers. Completion keeps the congratulatory message, while taps still explore the activities.
 
 Reduced Motion shows changing still poses. Animation pauses while the page is hidden or the native app is inactive. The original SVG remains a fallback if canvas is unavailable. The same script is bundled into both native apps; its initialization guard prevents duplicate companions when native injection and the page both load it.
 
