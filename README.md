@@ -4,7 +4,25 @@ A small love letter disguised as a countdown: pastel colors, an interactive doct
 
 ## Preview
 
-Screenshot placeholder: add a screenshot of the deployed site here.
+The website, native companions, and widgets share the same offline-first countdown experience.
+
+### GitHub Pages website
+
+![Desktop view of the residency countdown website](screenshots/github-page.png)
+
+### Native macOS and iOS apps
+
+| macOS companion | iPhone companion |
+| --- | --- |
+| ![The desktop-sized countdown experience used by the macOS app](screenshots/macos-app.png) | ![The phone-sized countdown experience used by the iOS app](screenshots/ios-app.png) |
+
+Both native apps present the bundled website in an offline `WKWebView`, so the countdown, celebration screen, and interactive doctor bunny stay consistent with GitHub Pages.
+
+### Widgets
+
+![Design mockup of the iOS, macOS, and Scriptable residency widgets with the doctor bunny](screenshots/widget-mockup.png)
+
+*Concept mockup — not a device capture.* The WidgetKit and Scriptable versions are system-refreshing snapshots with the doctor bunny; opening either takes you to the full live countdown.
 
 ## Run locally
 
