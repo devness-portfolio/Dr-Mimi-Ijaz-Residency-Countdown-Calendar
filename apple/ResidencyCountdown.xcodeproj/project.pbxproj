@@ -5,6 +5,53 @@
 	};
 	"objectVersion" = "56";
 	"objects" = {
+		"AABBCC000000000000000000" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.html";
+			"path" = "../index.html";
+			"sourceTree" = "<group>";
+		};
+		"AABBCC000000000000000010" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AABBCC000000000000000000";
+		};
+		"AABBCC000000000000000001" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder";
+			"path" = "../css";
+			"sourceTree" = "<group>";
+		};
+		"AABBCC000000000000000011" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AABBCC000000000000000001";
+		};
+		"AABBCC000000000000000002" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder";
+			"path" = "../js";
+			"sourceTree" = "<group>";
+		};
+		"AABBCC000000000000000012" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AABBCC000000000000000002";
+		};
+		"AABBCC000000000000000003" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder";
+			"path" = "../assets";
+			"sourceTree" = "<group>";
+		};
+		"AABBCC000000000000000013" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AABBCC000000000000000003";
+		};
+		"AABBCC000000000000000020" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = ("AABBCC000000000000000010", "AABBCC000000000000000011", "AABBCC000000000000000012", "AABBCC000000000000000013");
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+
 		"7EFF45C9D31D7733E7CADCEC" = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -451,7 +498,7 @@
 		"1F1E24306A3B7D9F30ACFD27" = {
 			"isa" = "PBXNativeTarget";
 			"buildConfigurationList" = "B3C29C5D1DF518180C9B0808";
-			"buildPhases" = ("8E35A7C666FE4BEA1A25F830", "91A2A6DEDF934EC18AF23D35", "A91166678B0FC32ACEA295A3");
+			"buildPhases" = ("8E35A7C666FE4BEA1A25F830", "91A2A6DEDF934EC18AF23D35", "AABBCC000000000000000020", "A91166678B0FC32ACEA295A3");
 			"buildRules" = ();
 			"dependencies" = ("95FCDA2BD45A54FFFE3C695C");
 			"name" = "ResidencymacOS";
@@ -467,7 +514,7 @@
 		};
 		"B28B7AF69320201D1CF206EB" = {
 			"isa" = "PBXGroup";
-			"children" = ("7EFF45C9D31D7733E7CADCEC", "763211BAFC13A4F826CDFE89", "5AAE00BD96889D0BB9BB9611", "228EABC89AFBF426299FA593", "FBDC4F23F93125BBEEAE800C");
+			"children" = ("AABBCC000000000000000000", "AABBCC000000000000000001", "AABBCC000000000000000002", "AABBCC000000000000000003", "7EFF45C9D31D7733E7CADCEC", "763211BAFC13A4F826CDFE89", "5AAE00BD96889D0BB9BB9611", "228EABC89AFBF426299FA593", "FBDC4F23F93125BBEEAE800C");
 			"sourceTree" = "<group>";
 		};
 		"89E1FD6268CC0F221A2BE178" = {

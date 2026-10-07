@@ -22,16 +22,17 @@ The Xcode project includes four targets: a native app and widget extension for e
 - Three iPhone Lock Screen formats.
 - Pastel pink, cream, and lavender styling, remaining days, and progress.
 - Automatic celebration text at completion. Large widgets and the app also show the Arabic-first verse and translation.
-- A companion app with a link to the full website's artwork and live detailed countdown.
-- Accessible progress labels and system typography. No custom animation or Unicode emoji.
+- The Mac app bundles the full website: matching pastel cards, doctor bunny, live detailed countdown, and celebration screen, all available offline. Its resizable window uses the website’s phone and desktop layouts.
+- The native iOS companion keeps its compact card and a link to the full website.
+- Accessible progress labels and no Unicode emoji. The Mac app preserves the website’s reduced-motion support for celebration animations.
 
 ## Dates and updates
 
 `Shared/Residency.swift` is the native date configuration: July 1, 2022 through July 1, 2027, at midnight in the device's current timezone. It matches the website's local-midnight behavior and rounded-up elapsed 24-hour days. The website retains its JavaScript configuration; if dates change, update both configurations.
 
-WidgetKit does not run the website or its once-per-second JavaScript timer. The widget supplies future entries at the precise times its displayed whole-day count changes, including completion, and requests a daily reload. The system controls actual presentation and refresh timing, so exact-to-the-second celebration is not guaranteed. Opening the app requests fresh widget timelines after travel/timezone changes. The companion view refreshes each minute; use the full website for the live seconds display.
+WidgetKit does not run the website or its once-per-second JavaScript timer. The widget supplies future entries at the precise times its displayed whole-day count changes, including completion, and requests a daily reload. The system controls actual presentation and refresh timing, so exact-to-the-second celebration is not guaranteed. Opening the app requests fresh widget timelines after travel/timezone changes. The native iOS companion view refreshes each minute. The Mac app uses the website’s once-per-second countdown.
 
-No network is needed for the app or widget countdown. The website link opens the existing GitHub Pages URL in the browser. The native app does not sync settings because there are no editable settings.
+No network is needed for the app or widget countdown. The iOS companion’s website link opens the existing GitHub Pages URL in the browser. The Mac app loads the repository’s `index.html`, `css`, `js`, and `assets` from its app bundle through WKWebView, without fetching the hosted site. These files are referenced directly by the Mac target’s Copy Bundle Resources phase; rebuild the Mac app after website changes. The Mac view uses the dates in `js/countdown.js`; native widgets continue to use `Shared/Residency.swift`. The native app does not sync settings because there are no editable settings.
 
 ## Validation
 
@@ -53,4 +54,4 @@ xcodebuild -project ResidencyCountdown.xcodeproj -scheme ResidencyiOS -sdk iphon
 
 Before device delivery, preview all widget sizes, Lock Screen styles, light/dark/tinted appearances, larger text, and celebration mode. To preview completion, pass a future `Date` into `ResidencyEntry` or `Countdown` in an Xcode preview, keeping production milestones intact.
 
-At authoring time, the countdown checks and macOS Swift type checks were run using Command Line Tools. Full app/extension builds, iOS compilation, signing, and rendered widget previews require full Xcode and remain unverified. App icons and App Store/TestFlight packaging are not included in this initial local-install project.
+The countdown checks and an unsigned Debug build of the Mac app and widget extension pass with Xcode 26.3. The Mac bundle includes byte-for-byte copies of the website resources. iOS compilation, signing, and rendered widget previews remain unverified. App icons and App Store/TestFlight packaging are not included in this local-install project.

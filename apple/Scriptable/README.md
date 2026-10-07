@@ -23,16 +23,20 @@ On the Mac, open **System Settings → Desktop & Dock → Widgets**, enable **Us
 
 On or after July 1, 2027, the widget changes to `YOU DID IT!`, the congratulations, and Alhamdulillah. Medium and large widgets also show the Arabic verse, translation, and citation.
 
-## Updated desktop layout and live timer
+## Website-inspired theme
 
-Replace the contents of your existing `Residency Countdown` script in Scriptable with the updated JavaScript file and run it once. Keep the same script selected in your widgets. The medium widget uses a compact two-column layout; small and large widgets stack the countdown vertically.
+Replace the contents of your existing `Residency Countdown` script in Scriptable with the updated JavaScript file and run it once. Keep the same script selected in your widgets. The widget now uses the website’s cream card, pink/lavender background, Georgia countdown numbers, pastel detail tiles, and progress bar.
 
-The timer uses `WidgetDate.applyTimerStyle()` with the actual completion date. It can update independently of script refreshes; it is not a custom months/weeks/days/seconds display. Mirrored iPhone widgets on macOS may update less frequently, so continuous second-by-second animation on the Mac is not guaranteed. At completion, the system must refresh the script to show the celebration; until then a native timer can start counting upward.
+The medium and large countdown widgets include the doctor bunny from `assets/bunny.svg`, translated into local drawing commands inside the script. No image downloads, companion files, or network connection are needed to render it. Small widgets prioritize the day count, live timer, and progress. Celebration layouts retain the personal messages, with an Arabic-first verse panel on medium and large widgets.
 
-For pastel colors on the Mac, choose **System Settings → Desktop & Dock → Widgets → Widget style → Full-color**. Automatic or monochrome styles can mute the colors. Use the medium widget for the compact desktop layout.
+For pastel colors on the Mac, choose **System Settings → Desktop & Dock → Widgets → Widget style → Full-color**. Automatic or monochrome styles can mute the colors.
 
-## Large widget breakdown
+## Live timer and large widget breakdown
 
-The large Scriptable widget adds a two-row months / weeks / days / hours / minutes / seconds snapshot with an “as of” time. Months use calendar arithmetic with month-end clamping, matching the website; the remaining duration is split into weeks, days, hours, minutes, and seconds. These are component values, not six independent totals.
+The large widget includes two rows of pink, lavender, and cream tiles for months / weeks / days / hours / minutes / seconds, with an “as of” time. Months use calendar arithmetic with month-end clamping, matching the website. These are component values, not six independent totals. Custom text cannot tick every second in Scriptable widgets. This snapshot requests a refresh after 15 minutes (or the next day-count transition, if sooner); the operating system may delay it.
 
-Custom text cannot tick every second in Scriptable widgets. This snapshot requests a refresh after 15 minutes (or the next day-count transition, if sooner); the operating system may delay it. A separate native timer to the actual completion date remains below the snapshot. Small and medium widgets keep their existing layout. Tap the widget to see the full six-unit countdown updating each second on the website.
+All countdown sizes retain a separate native timer using `WidgetDate.applyTimerStyle()` with the actual completion date. It shows total hours, minutes, and seconds independently of script refreshes. Mirrored widgets on macOS may update less frequently. At completion, the system must refresh the script to show the celebration; until then a native timer can start counting upward. Tap the widget for the full website, including its live six-unit countdown and animated celebration.
+
+## Validation
+
+The JavaScript was syntax-checked and exercised with Scriptable API mocks across small, medium, and large countdown and celebration states. This checks script execution, text, native timer dates, and refresh scheduling; it does not substitute for a visual check in Scriptable on an iPhone or a mirrored Mac widget.
